@@ -58,6 +58,7 @@
 
 ## [必读] 部分功能说明
 受篇幅的限制，我们强烈建议使用本项目的博主们阅读以下文章：
-新增功能的食用指南，详见博客原文：[Mimosa的Argon重构主题公开计划](https://loneapex.cn/archives/3740)
-关于博客美化，详见这篇文章：[博客食用的预制菜（主题美化记录）](https://loneapex.cn/webcodeforbeauty)
-关于原主题的食用文档，Mimosa也强烈建议您阅读：[Argon Theme Docs](https://argon-docs.solstice23.top/#/)
+
+- 新增功能的食用指南，详见博客原文：[Mimosa的Argon重构主题公开计划](https://loneapex.cn/archives/3740)
+- 关于博客美化，详见这篇文章：[博客食用的预制菜（主题美化记录）](https://loneapex.cn/webcodeforbeauty)
+- 关于原主题的食用文档，Mimosa也强烈建议您阅读：[Argon Theme Docs](https://argon-docs.solstice23.top/#/)
