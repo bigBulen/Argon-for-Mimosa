@@ -1,5 +1,12 @@
+<!-- 寄蜉蝣于天地，
+     渺沧海之一粟。
+     哀吾生之须臾，
+     羡长江之无穷。
+             ————2024.10.10-->
+
 <!DOCTYPE html>
 <?php
+	
 	$htmlclasses = "";
 	if (get_option('argon_page_layout') == "single"){
 		$htmlclasses .= "single-column ";
@@ -47,6 +54,9 @@
 	}
 ?>
 
+
+
+
 <html <?php language_attributes(); ?> class="no-js <?php echo $htmlclasses;?>">
 <?php
 	$themecolor = get_option("argon_theme_color", "#5e72e4");
@@ -71,9 +81,8 @@
 	}
 ?>
 <head>
-    <!--Live2D show start-->
-    <!--<script type="text/javascript" src="<?php echo $GLOBALS['assets_path']; ?>/extra-js/jquery-3.7.1.min.js"></script>-->
-    <!--Live2D show end-->
+    <!--umami用户跟踪-->
+    <script defer src="https://umami.loneapex.cn/script.js" data-website-id="5a4fffdb-7da2-4927-a401-ea245e4b976a"></script>
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<?php if (get_option('argon_enable_mobile_scale') != 'true'){ ?>
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -426,7 +435,7 @@
 	</div>
 </div>
 <!--Banner-->
-<link href="<?php echo $GLOBALS['assets_path']; ?>/extra-js/myface.css" rel="stylesheet">
+<link href="https://loneapex.cn/extra-js/myface.css" rel="stylesheet">
 <section id="banner" class="banner section section-lg section-shaped">
 	<div class="shape <?php echo get_option('argon_banner_background_hide_shapes') == 'true' ? '' : 'shape-style-1' ?> <?php echo get_option('argon_banner_background_color_type') == '' ? 'shape-primary' : get_option('argon_banner_background_color_type'); ?>">
 		<span></span>
@@ -506,50 +515,143 @@ if ( $custom_bg_url !== '' ) : ?>
         }
         <?php endif; ?>
 
-        #content:before {
-            content: '';
-            position: fixed; inset: 0;
+        .background-layer {
+            position: fixed;
+            top: -5%; left: -5%;
+            width: 110%;
+            height: 110%;
+            background-size: cover;
+            background-position: center;
             z-index: -2;
-            background: url(<?php echo esc_url( $custom_bg_url ); ?>)
-                        center / cover no-repeat;
-            opacity: <?php echo ( get_option('argon_page_background_opacity') === '' ? '1' : get_option('argon_page_background_opacity') ); ?>;
-            transition: opacity .5s ease;
+            transition: opacity 0.5s ease;
+            opacity: 0;
+            /* 添加平滑过渡效果 */
+            transition: transform 0.1s ease-out;
+            will-change: transform;
         }
 
-        html.darkmode #content:before {
-            filter: brightness(0.65);
+        #background-layer {
+            background-image: url('<?php echo esc_url( $custom_bg_url ); ?>');
+            opacity: <?php echo ( get_option('argon_page_background_opacity') === '' ? '1' : get_option('argon_page_background_opacity') ); ?>;
         }
 
         <?php if ( $custom_bg_dark_url != '' ) : ?>
-        #content:after {
-            content: '';
-            position: fixed; inset: 0;
-            z-index: -2;
-            background: url(<?php echo esc_url( $custom_bg_dark_url ); ?>)
-                        center / cover no-repeat;
-            opacity: 0;
-            transition: opacity .5s ease;
+        #background-layer-dark {
+            background-image: url('<?php echo esc_url( $custom_bg_dark_url ); ?>');
         }
-        html.darkmode #content:after {
+        html.darkmode #background-layer-dark {
             opacity: <?php echo ( get_option('argon_page_background_opacity') === '' ? '1' : get_option('argon_page_background_opacity') ); ?>;
         }
-        html.darkmode #content:before {
+        html.darkmode #background-layer {
             opacity: 0;
         } 
+        <?php else: ?>
+        html.darkmode #background-layer {
+            filter: brightness(0.65);
+        }
         <?php endif; ?>
         
         #birthday-overlay {
             content: '';
             position: fixed;
             inset: 0;
-            z-index: -1; /* 介于背景(-2)和内容(0)之间 */
+            z-index: -1;
             pointer-events: none;
             background: rgba(0, 0, 0, <?php echo esc_attr($bg_overlay_alpha); ?>);
             transition: background .5s ease;
         }
     </style>
-<?php endif; ?>
 
+    <!-- 背景层容器 -->
+    <div id="background-layer" class="background-layer"></div>
+    <?php if ( $custom_bg_dark_url != '' ) : ?>
+    <div id="background-layer-dark" class="background-layer"></div>
+    <?php endif; ?>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const backgroundLayer = document.getElementById('background-layer');
+            const backgroundLayerDark = document.getElementById('background-layer-dark');
+            
+            // 视差效果强度（数值越小效果越明显）
+            const parallaxStrength = 0.02;
+            
+            // 平滑动画相关变量
+            let targetX = 0;
+            let targetY = 0;
+            let currentX = 0;
+            let currentY = 0;
+            let animationId = null;
+            
+            // 插值函数（用于平滑过渡）
+            function lerp(start, end, factor) {
+                return start + (end - start) * factor;
+            }
+            
+            // 动画循环
+            function animate() {
+                // 使用插值实现平滑移动
+                currentX = lerp(currentX, targetX, 0.1);
+                currentY = lerp(currentY, targetY, 0.1);
+                
+                // 应用变换
+                const transformValue = `translate(${currentX}px, ${currentY}px)`;
+                backgroundLayer.style.transform = transformValue;
+                
+                if (backgroundLayerDark) {
+                    backgroundLayerDark.style.transform = transformValue;
+                }
+                
+                // 继续动画循环
+                animationId = requestAnimationFrame(animate);
+            }
+            
+            // 启动动画循环
+            animate();
+            
+            // 鼠标移动事件监听
+            document.addEventListener('mousemove', function(e) {
+                // 获取鼠标位置
+                const mouseX = e.clientX;
+                const mouseY = e.clientY;
+                
+                // 获取窗口尺寸
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+                
+                // 计算目标位置（相对于中心点的偏移量）
+                targetX = (mouseX - windowWidth / 2) * parallaxStrength;
+                targetY = (mouseY - windowHeight / 2) * parallaxStrength;
+            });
+            
+            // 设备方向事件（移动端支持）
+            if (window.DeviceOrientationEvent) {
+                window.addEventListener('deviceorientation', function(event) {
+                    const tiltLR = event.gamma;  // 左右倾斜 (-90 到 90)
+                    const tiltFB = event.beta;   // 前后倾斜 (-180 到 180)
+                    
+                    targetX = (tiltLR || 0) * 2;
+                    targetY = (tiltFB || 0) * 2;
+                });
+            }
+            
+            // 窗口大小改变时重置位置
+            window.addEventListener('resize', function() {
+                targetX = 0;
+                targetY = 0;
+                currentX = 0;
+                currentY = 0;
+            });
+            
+            // 页面卸载时清理动画
+            window.addEventListener('beforeunload', function() {
+                if (animationId) {
+                    cancelAnimationFrame(animationId);
+                }
+            });
+        });
+    </script>
+<?php endif; ?>
 
 
 
